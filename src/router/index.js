@@ -1,10 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
-Vue.use(Router)
-
 /* Layout */
 import Layout from '@/layout'
+
+Vue.use(Router)
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -53,6 +52,34 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: { title: 'Dashboard', icon: 'dashboard' }
     }]
+  },
+  {
+    path: '/system',
+    component: Layout,
+    meta: {
+      title: '系统管理',
+      icon: 'el-icon-s-tools'
+    },
+    alwaysShow: true,
+    children: [
+      {
+        name: 'sysUser',
+        path: 'sysUser',
+        component: () => import('@/views/system/sysUser/list'),
+        meta: {
+          title: '用户管理',
+          icon: 'el-icon-s-custom'
+        }
+      },
+      {
+        path: 'sysRole',
+        component: () => import('@/views/system/sysRole/list'),
+        meta: {
+          title: '角色管理',
+          icon: 'el-icon-s-help'
+        }
+      }
+    ]
   },
 
   {
