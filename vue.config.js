@@ -5,7 +5,9 @@ const defaultSettings = require('./src/settings.js')
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
-
+module.exports = {
+  lintOnSave: false // 修改成false 就是不检查了
+}
 const name = defaultSettings.title || 'vue Admin Template' // page title
 
 // If your port is set to 80,
