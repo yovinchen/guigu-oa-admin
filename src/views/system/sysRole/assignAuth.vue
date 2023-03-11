@@ -4,25 +4,24 @@
       授权角色：{{ $route.query.roleName }}
     </div>
     <el-tree
+      style="margin: 20px 0"
       ref="tree"
       :data="sysMenuList"
-      :props="defaultProps"
-      default-expand-all
       node-key="id"
       show-checkbox
-      style="margin: 20px 0"
+      default-expand-all
+      :props="defaultProps"
     />
     <div style="padding: 20px 20px;">
-      <el-button :loading="loading" icon="el-icon-check" size="mini" type="primary" @click="save">保存</el-button>
-      <el-button icon="el-icon-refresh-right" size="mini" @click="$router.push('/system/sysRole')">返回</el-button>
+      <el-button :loading="loading" type="primary" icon="el-icon-check" size="mini" @click="save">保存</el-button>
+      <el-button @click="$router.push('/system/sysRole')" size="mini" icon="el-icon-refresh-right">返回</el-button>
     </div>
   </div>
 </template>
 <script>
 import api from '@/api/system/sysMenu'
-
 export default {
-  name: 'RoleAuth',
+  name: 'roleAuth',
 
   data() {
     return {
@@ -31,8 +30,8 @@ export default {
       defaultProps: {
         children: 'children',
         label: 'name'
-      }
-    }
+      },
+    };
   },
 
   created() {
@@ -41,8 +40,8 @@ export default {
 
   methods: {
     /*
-      初始化
-      */
+    初始化
+    */
     fetchData() {
       const roleId = this.$route.query.id
       api.toAssign(roleId).then(result => {
@@ -55,9 +54,9 @@ export default {
     },
 
     /*
-      得到所有选中的id列表
-      */
-    getCheckedIds(auths, initArr = []) {
+    得到所有选中的id列表
+    */
+    getCheckedIds (auths, initArr = []) {
       return auths.reduce((pre, item) => {
         if (item.select && item.children.length === 0) {
           pre.push(item.id)
@@ -69,16 +68,17 @@ export default {
     },
 
     /*
-      保存权限列表
-      */
+    保存权限列表
+    */
     save() {
-      // 获取到当前子节点
-      // const checkedNodes = this.$refs.tree.getCheckedNodes()
-      // 获取到当前子节点及父节点
-      const allCheckedNodes = this.$refs.tree.getCheckedNodes(false, true)
-      const idList = allCheckedNodes.map(node => node.id)
+      debugger
+      //获取到当前子节点
+      //const checkedNodes = this.$refs.tree.getCheckedNodes()
+      //获取到当前子节点及父节点
+      const allCheckedNodes = this.$refs.tree.getCheckedNodes(false, true);
+      let idList = allCheckedNodes.map(node => node.id);
       console.log(idList)
-      const assginMenuVo = {
+      let assginMenuVo = {
         roleId: this.$route.query.id,
         menuIdList: idList
       }
@@ -86,9 +86,9 @@ export default {
       api.doAssign(assginMenuVo).then(result => {
         this.loading = false
         this.$message.success(result.$message || '分配权限成功')
-        this.$router.push('/system/sysRole')
+        this.$router.push('/system/sysRole');
       })
     }
   }
-}
+};
 </script>
