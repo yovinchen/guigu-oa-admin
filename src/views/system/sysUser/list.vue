@@ -6,58 +6,68 @@
         <el-row>
           <el-col :span="8">
             <el-form-item label="关 键 字">
-              <el-input style="width: 95%" v-model="searchObj.keyword" placeholder="用户名/姓名/手机号码"></el-input>
+              <el-input v-model="searchObj.keyword" placeholder="用户名/姓名/手机号码" style="width: 95%"/>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="操作时间">
               <el-date-picker
                 v-model="createTimes"
-                type="datetimerange"
+                end-placeholder="结束时间"
                 range-separator="至"
                 start-placeholder="开始时间"
-                end-placeholder="结束时间"
-                value-format="yyyy-MM-dd HH:mm:ss"
                 style="margin-right: 10px;width: 100%;"
+                type="datetimerange"
+                value-format="yyyy-MM-dd HH:mm:ss"
               />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row style="display:flex">
-          <el-button type="primary" icon="el-icon-search" size="mini" :loading="loading" @click="fetchData()">搜索</el-button>
+          <el-button :loading="loading" icon="el-icon-search" size="mini" type="primary" @click="fetchData()">搜索
+          </el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetData">重置</el-button>
-          <el-button type="success" icon="el-icon-plus" size="mini" @click="add">添 加</el-button>
+          <el-button
+            :disabled="$hasBP('bnt.sysUser.add') === false"
+            icon="el-icon-plus"
+            size="mini"
+            type="success"
+            @click="add"
+          >添 加
+          </el-button>
         </el-row>
       </el-form>
     </div>
 
     <!-- 工具条 -->
-<!--    <div class="tools-div">-->
-<!--      <el-button type="success" icon="el-icon-plus" size="mini" @click="add">添 加</el-button>-->
-<!--    </div>-->
+    <!--    <div class="tools-div">-->
+    <!--      <el-button type="success" icon="el-icon-plus" size="mini" @click="add">添 加</el-button>-->
+    <!--    </div>-->
 
     <!-- 列表 -->
     <el-table
       v-loading="listLoading"
       :data="list"
-      stripe
       border
-      style="width: 100%;margin-top: 10px;">
+      stripe
+      style="width: 100%;margin-top: 10px;"
+    >
 
       <el-table-column
+        align="center"
         label="序号"
         width="70"
-        align="center">
+      >
         <template slot-scope="scope">
           {{ (page - 1) * limit + scope.$index + 1 }}
         </template>
       </el-table-column>
 
-      <el-table-column prop="username" label="用户名" width="100"/>
-      <el-table-column prop="name" label="姓名" width="70"/>
-      <el-table-column prop="phone" label="手机" width="120"/>
-      <el-table-column prop="postName" label="岗位" width="100"/>
-      <el-table-column prop="deptName" label="部门" width="100"/>
+      <el-table-column label="用户名" prop="username" width="100"/>
+      <el-table-column label="姓名" prop="name" width="70"/>
+      <el-table-column label="手机" prop="phone" width="120"/>
+      <el-table-column label="岗位" prop="postName" width="100"/>
+      <el-table-column label="部门" prop="deptName" width="100"/>
       <el-table-column label="所属角色" width="130">
         <template slot-scope="scope">
           <span v-for="item in scope.row.roleList" :key="item.id" style="margin-right: 10px;">{{ item.roleName }}</span>
@@ -67,17 +77,38 @@
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.status === 1"
-            @change="switchStatus(scope.row)">
-          </el-switch>
+            @change="switchStatus(scope.row)"
+          />
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" width="160"/>
+      <el-table-column label="创建时间" prop="createTime" width="160"/>
 
-      <el-table-column label="操作" width="180" align="center" fixed="right">
+      <el-table-column align="center" fixed="right" label="操作" width="180">
         <template slot-scope="scope">
-          <el-button type="primary" icon="el-icon-edit" size="mini" @click="edit(scope.row.id)" title="修改"/>
-          <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeDataById(scope.row.id)" title="删除" />
-          <el-button type="warning" icon="el-icon-baseball" size="mini" @click="showAssignRole(scope.row)" title="分配角色"/>
+          <el-button
+            :disabled="$hasBP('bnt.sysUser.update') === false"
+            icon="el-icon-edit"
+            size="mini"
+            title="修改"
+            type="primary"
+            @click="edit(scope.row.id)"
+          />
+          <el-button
+            :disabled="$hasBP('bnt.sysUser.remove') === false"
+            icon="el-icon-delete"
+            size="mini"
+            title="删除"
+            type="danger"
+            @click="removeDataById(scope.row.id)"
+          />
+          <el-button
+            :disabled="$hasBP('bnt.sysUser.assignRole') === false"
+            icon="el-icon-baseball"
+            size="mini"
+            title="分配角色"
+            type="warning"
+            @click="showAssignRole(scope.row)"
+          />
         </template>
       </el-table-column>
     </el-table>
@@ -85,17 +116,17 @@
     <!-- 分页组件 -->
     <el-pagination
       :current-page="page"
-      :total="total"
       :page-size="limit"
       :page-sizes="[5, 10, 20, 30, 40, 50, 100]"
-      style="padding: 30px 0; text-align: center;"
+      :total="total"
       layout="sizes, prev, pager, next, jumper, ->, total, slot"
+      style="padding: 30px 0; text-align: center;"
       @current-change="fetchData"
       @size-change="changeSize"
     />
 
-    <el-dialog title="添加/修改" :visible.sync="dialogVisible" width="40%" >
-      <el-form ref="dataForm" :model="sysUser"  label-width="100px" size="small" style="padding-right: 40px;">
+    <el-dialog :visible.sync="dialogVisible" title="添加/修改" width="40%">
+      <el-form ref="dataForm" :model="sysUser" label-width="100px" size="small" style="padding-right: 40px;">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="sysUser.username"/>
         </el-form-item>
@@ -110,28 +141,29 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false" size="small" icon="el-icon-refresh-right">取 消</el-button>
-        <el-button type="primary" icon="el-icon-check" @click="saveOrUpdate()" size="small">确 定</el-button>
+        <el-button icon="el-icon-refresh-right" size="small" @click="dialogVisible = false">取 消</el-button>
+        <el-button icon="el-icon-check" size="small" type="primary" @click="saveOrUpdate()">确 定</el-button>
       </span>
     </el-dialog>
 
-    <el-dialog title="分配角色" :visible.sync="dialogRoleVisible">
+    <el-dialog :visible.sync="dialogRoleVisible" title="分配角色">
       <el-form label-width="80px">
         <el-form-item label="用户名">
-          <el-input disabled :value="sysUser.username"></el-input>
+          <el-input :value="sysUser.username" disabled/>
         </el-form-item>
 
         <el-form-item label="角色列表">
-          <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
-          <div style="margin: 15px 0;"></div>
+          <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选
+          </el-checkbox>
+          <div style="margin: 15px 0;"/>
           <el-checkbox-group v-model="userRoleIds" @change="handleCheckedChange">
-            <el-checkbox v-for="role in allRoles" :key="role.id" :label="role.id">{{role.roleName}}</el-checkbox>
+            <el-checkbox v-for="role in allRoles" :key="role.id" :label="role.id">{{ role.roleName }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
       </el-form>
       <div slot="footer">
-        <el-button type="primary" @click="assignRole" size="small">保存</el-button>
-        <el-button @click="dialogRoleVisible = false" size="small">取消</el-button>
+        <el-button size="small" type="primary" @click="assignRole">保存</el-button>
+        <el-button size="small" @click="dialogRoleVisible = false">取消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -140,6 +172,7 @@
 <script>
 import api from '@/api/system/sysUser'
 import roleApi from '@/api/system/sysRole'
+
 const defaultForm = {
   id: '',
   username: '',
@@ -178,7 +211,7 @@ export default {
     this.fetchData()
 
     roleApi.findAll().then(response => {
-      this.roleList = response.data;
+      this.roleList = response.data
     })
   },
 
@@ -201,14 +234,14 @@ export default {
       this.page = page
       console.log('翻页。。。' + this.page)
 
-      if(this.createTimes && this.createTimes.length ==2) {
+      if (this.createTimes && this.createTimes.length == 2) {
         this.searchObj.createTimeBegin = this.createTimes[0]
         this.searchObj.createTimeEnd = this.createTimes[1]
       }
 
       api.getPageList(this.page, this.limit, this.searchObj).then(
         response => {
-          //this.list = response.data.list
+          // this.list = response.data.list
           this.list = response.data.records
           this.total = response.data.total
 
@@ -245,7 +278,7 @@ export default {
     },
 
     // -------------
-    add(){
+    add() {
       this.dialogVisible = true
       this.sysUser = Object.assign({}, defaultForm)
     },
@@ -292,26 +325,26 @@ export default {
       })
     },
 
-    showAssignRole (row) {
+    showAssignRole(row) {
       this.sysUser = row
       this.dialogRoleVisible = true
       this.getRoles()
     },
 
-    getRoles () {
+    getRoles() {
       roleApi.getRoles(this.sysUser.id).then(response => {
         const {allRolesList, assginRoleList} = response.data
         this.allRoles = allRolesList
         this.userRoleIds = assginRoleList.map(item => item.id)
-        this.checkAll = allRolesList.length===assginRoleList.length
-        this.isIndeterminate = assginRoleList.length>0 && assginRoleList.length<allRolesList.length
+        this.checkAll = allRolesList.length === assginRoleList.length
+        this.isIndeterminate = assginRoleList.length > 0 && assginRoleList.length < allRolesList.length
       })
     },
 
     /*
     全选勾选状态发生改变的监听
     */
-    handleCheckAllChange (value) {// value 当前勾选状态true/false
+    handleCheckAllChange(value) { // value 当前勾选状态true/false
       // 如果当前全选, userRoleIds就是所有角色id的数组, 否则是空数组
       this.userRoleIds = value ? this.allRoles.map(item => item.id) : []
       // 如果当前不是全选也不全不选时, 指定为false
@@ -321,14 +354,14 @@ export default {
     /*
     角色列表选中项发生改变的监听
     */
-    handleCheckedChange (value) {
+    handleCheckedChange(value) {
       const {userRoleIds, allRoles} = this
-      this.checkAll = userRoleIds.length === allRoles.length && allRoles.length>0
-      this.isIndeterminate = userRoleIds.length>0 && userRoleIds.length<allRoles.length
+      this.checkAll = userRoleIds.length === allRoles.length && allRoles.length > 0
+      this.isIndeterminate = userRoleIds.length > 0 && userRoleIds.length < allRoles.length
     },
 
-    assignRole () {
-      let assginRoleVo = {
+    assignRole() {
+      const assginRoleVo = {
         userId: this.sysUser.id,
         roleIdList: this.userRoleIds
       }

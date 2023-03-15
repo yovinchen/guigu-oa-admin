@@ -3,97 +3,130 @@
 
     <!-- 工具条 -->
     <div class="tools-div">
-      <el-button type="success" icon="el-icon-plus" size="mini" @click="add()">添 加</el-button>
+      <el-button
+        :disabled="$hasBP('bnt.sysMenu.add') === false"
+        icon="el-icon-plus"
+        size="mini"
+        type="success"
+        @click="add()"
+      >添 加
+      </el-button>
     </div>
     <el-table
       :data="sysMenuList"
-      style="width: 100%;margin-bottom: 20px;margin-top: 10px;"
-      row-key="id"
-      border
       :default-expand-all="false"
-      :tree-props="{children: 'children'}">
+      :tree-props="{children: 'children'}"
+      border
+      row-key="id"
+      style="width: 100%;margin-bottom: 20px;margin-top: 10px;"
+    >
 
-      <el-table-column prop="name" label="菜单名称" width="160"/>
+      <el-table-column label="菜单名称" prop="name" width="160"/>
       <el-table-column label="图标">
         <template slot-scope="scope">
-          <i :class="scope.row.icon"></i>
+          <i :class="scope.row.icon"/>
         </template>
       </el-table-column>
-      <el-table-column prop="perms" label="权限标识" width="160"/>
-      <el-table-column prop="path" label="路由地址" width="120"/>
-      <el-table-column prop="component" label="组件路径" width="160"/>
-      <el-table-column prop="sortValue" label="排序" width="60"/>
+      <el-table-column label="权限标识" prop="perms" width="160"/>
+      <el-table-column label="路由地址" prop="path" width="120"/>
+      <el-table-column label="组件路径" prop="component" width="160"/>
+      <el-table-column label="排序" prop="sortValue" width="60"/>
       <el-table-column label="状态" width="80">
         <template slot-scope="scope">
           <el-switch
-            v-model="scope.row.status === 1" disabled="true">
-          </el-switch>
+            v-model="scope.row.status === 1"
+            disabled="true"
+          />
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" width="160"/>
-      <el-table-column label="操作" width="180" align="center" fixed="right">
+      <el-table-column label="创建时间" prop="createTime" width="160"/>
+      <el-table-column align="center" fixed="right" label="操作" width="180">
         <template slot-scope="scope">
-          <el-button type="success" v-if="scope.row.type !== 2" icon="el-icon-plus" size="mini" @click="add(scope.row)" title="添加下级节点"/>
-          <el-button type="primary" icon="el-icon-edit" size="mini" @click="edit(scope.row)" title="修改"/>
-          <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeDataById(scope.row.id)" title="删除" :disabled="scope.row.children.length > 0"/>
+          <el-button
+            v-if="scope.row.type !== 2"
+            icon="el-icon-plus"
+            size="mini"
+            title="添加下级节点"
+            type="success"
+            @click="add(scope.row)"
+          />
+          <el-button
+            :disabled="$hasBP('bnt.sysMenu.update') === false"
+            icon="el-icon-edit"
+            size="mini"
+            title="修改"
+            type="primary"
+            @click="edit(scope.row)"
+          />
+          <el-button
+            :disabled="(scope.row.children.length > 0) || !$hasBP('bnt.sysMenu.remove')"
+            icon="el-icon-delete"
+            size="mini"
+            title="删除"
+            type="danger"
+            @click="removeDataById(scope.row.id)"
+          />
         </template>
       </el-table-column>
     </el-table>
 
-    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="40%" >
+    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="40%">
       <el-form ref="dataForm" :model="sysMenu" label-width="150px" size="small" style="padding-right: 40px;">
-        <el-form-item label="上级部门" v-if="sysMenu.id === ''">
+        <el-form-item v-if="sysMenu.id === ''" label="上级部门">
           <el-input v-model="sysMenu.parentName" disabled="true"/>
         </el-form-item>
         <el-form-item label="菜单类型" prop="type">
           <el-radio-group v-model="sysMenu.type" :disabled="typeDisabled">
-            <el-radio :label="0" :disabled="type0Disabled">目录</el-radio>
-            <el-radio :label="1" :disabled="type1Disabled">菜单</el-radio>
-            <el-radio :label="2" :disabled="type2Disabled">按钮</el-radio>
+            <el-radio :disabled="type0Disabled" :label="0">目录</el-radio>
+            <el-radio :disabled="type1Disabled" :label="1">菜单</el-radio>
+            <el-radio :disabled="type2Disabled" :label="2">按钮</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="菜单名称" prop="name">
           <el-input v-model="sysMenu.name"/>
         </el-form-item>
-        <el-form-item label="图标" prop="icon" v-if="sysMenu.type !== 2">
+        <el-form-item v-if="sysMenu.type !== 2" label="图标" prop="icon">
           <el-select v-model="sysMenu.icon" clearable>
             <el-option v-for="item in iconList" :key="item.class" :label="item.class" :value="item.class">
-            <span style="float: left;">
-             <i :class="item.class"></i>  <!-- 如果动态显示图标，这里添加判断 -->
-            </span>
+              <span style="float: left;">
+                <i :class="item.class"/>  <!-- 如果动态显示图标，这里添加判断 -->
+              </span>
               <span style="padding-left: 6px;">{{ item.class }}</span>
             </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="排序">
-          <el-input-number v-model="sysMenu.sortValue" controls-position="right" :min="0" />
+          <el-input-number v-model="sysMenu.sortValue" :min="0" controls-position="right"/>
         </el-form-item>
         <el-form-item prop="path">
-              <span slot="label">
-                <el-tooltip content="访问的路由地址，如：`sysUser`" placement="top">
-                <i class="el-icon-question"></i>
-                </el-tooltip>
-                路由地址
-              </span>
-          <el-input v-model="sysMenu.path" placeholder="请输入路由地址" />
+          <span slot="label">
+            <el-tooltip content="访问的路由地址，如：`sysUser`" placement="top">
+              <i class="el-icon-question"/>
+            </el-tooltip>
+            路由地址
+          </span>
+          <el-input v-model="sysMenu.path" placeholder="请输入路由地址"/>
         </el-form-item>
-        <el-form-item prop="component" v-if="sysMenu.type !== 0">
-              <span slot="label">
-                <el-tooltip content="访问的组件路径，如：`system/user/index`，默认在`views`目录下" placement="top">
-                <i class="el-icon-question"></i>
-                </el-tooltip>
-                组件路径
-              </span>
-          <el-input v-model="sysMenu.component" placeholder="请输入组件路径" />
+        <el-form-item v-if="sysMenu.type !== 0" prop="component">
+          <span slot="label">
+            <el-tooltip content="访问的组件路径，如：`system/user/index`，默认在`views`目录下" placement="top">
+              <i class="el-icon-question"/>
+            </el-tooltip>
+            组件路径
+          </span>
+          <el-input v-model="sysMenu.component" placeholder="请输入组件路径"/>
         </el-form-item>
         <el-form-item v-if="sysMenu.type === 2">
-          <el-input v-model="sysMenu.perms" placeholder="请输入权限标识" maxlength="100" />
+          <el-input v-model="sysMenu.perms" maxlength="100" placeholder="请输入权限标识"/>
           <span slot="label">
-                <el-tooltip content="控制器中定义的权限字符，如：@PreAuthorize(hasAuthority('bnt.sysRole.list'))" placement="top">
-                <i class="el-icon-question"></i>
-                </el-tooltip>
-                权限字符
-              </span>
+            <el-tooltip
+              content="控制器中定义的权限字符，如：@PreAuthorize(hasAuthority('bnt.sysRole.list'))"
+              placement="top"
+            >
+              <i class="el-icon-question"/>
+            </el-tooltip>
+            权限字符
+          </span>
         </el-form-item>
         <el-form-item label="状态" prop="type">
           <el-radio-group v-model="sysMenu.status">
@@ -103,16 +136,16 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false" size="small" icon="el-icon-refresh-right">取 消</el-button>
-        <el-button type="primary" icon="el-icon-check" @click="saveOrUpdate()" size="small">确 定</el-button>
+        <el-button icon="el-icon-refresh-right" size="small" @click="dialogVisible = false">取 消</el-button>
+        <el-button icon="el-icon-check" size="small" type="primary" @click="saveOrUpdate()">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
-
 <script>
 import api from '@/api/system/sysMenu'
+
 const defaultForm = {
   id: '',
   parentId: '',
@@ -144,55 +177,55 @@ export default {
 
       iconList: [
         {
-          class: "el-icon-s-tools",
+          class: 'el-icon-s-tools'
         },
         {
-          class: "el-icon-s-custom",
+          class: 'el-icon-s-custom'
         },
         {
-          class: "el-icon-setting",
+          class: 'el-icon-setting'
         },
         {
-          class: "el-icon-user-solid",
+          class: 'el-icon-user-solid'
         },
         {
-          class: "el-icon-s-help",
+          class: 'el-icon-s-help'
         },
         {
-          class: "el-icon-phone",
+          class: 'el-icon-phone'
         },
         {
-          class: "el-icon-s-unfold",
+          class: 'el-icon-s-unfold'
         },
         {
-          class: "el-icon-s-operation",
+          class: 'el-icon-s-operation'
         },
         {
-          class: "el-icon-more-outline",
+          class: 'el-icon-more-outline'
         },
         {
-          class: "el-icon-s-check",
+          class: 'el-icon-s-check'
         },
         {
-          class: "el-icon-tickets",
+          class: 'el-icon-tickets'
         },
         {
-          class: "el-icon-s-goods",
+          class: 'el-icon-s-goods'
         },
         {
-          class: "el-icon-document-remove",
+          class: 'el-icon-document-remove'
         },
         {
-          class: "el-icon-warning",
+          class: 'el-icon-warning'
         },
         {
-          class: "el-icon-warning-outline",
+          class: 'el-icon-warning-outline'
         },
         {
-          class: "el-icon-question",
+          class: 'el-icon-question'
         },
         {
-          class: "el-icon-info",
+          class: 'el-icon-info'
         }
       ]
     }
@@ -235,7 +268,7 @@ export default {
     },
 
     // -------------
-    add(row){
+    add(row) {
       debugger
       this.typeDisabled = false
       this.dialogTitle = '添加下级节点'
@@ -243,17 +276,17 @@ export default {
 
       this.sysMenu = Object.assign({}, defaultForm)
       this.sysMenu.id = ''
-      if(row) {
+      if (row) {
         this.sysMenu.parentId = row.id
         this.sysMenu.parentName = row.name
-        //this.sysMenu.component = 'ParentView'
-        if(row.type === 0) {
+        // this.sysMenu.component = 'ParentView'
+        if (row.type === 0) {
           this.sysMenu.type = 1
           this.typeDisabled = false
           this.type0Disabled = false
           this.type1Disabled = false
           this.type2Disabled = true
-        } else if(row.type === 1) {
+        } else if (row.type === 1) {
           this.sysMenu.type = 2
           this.typeDisabled = true
         }
@@ -276,7 +309,7 @@ export default {
     },
 
     saveOrUpdate() {
-      if(this.sysMenu.type === 0 && this.sysMenu.parentId !== 0) {
+      if (this.sysMenu.type === 0 && this.sysMenu.parentId !== 0) {
         this.sysMenu.component = 'ParentView'
       }
       this.$refs.dataForm.validate(valid => {
