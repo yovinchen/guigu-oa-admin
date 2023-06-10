@@ -1,8 +1,10 @@
-/*
-角色管理相关的API请求函数
-*/
 import request from '@/utils/request'
 
+/**
+ * 角色管理相关的API请求函数
+ *
+ * @type {string}
+ */
 const api_name = '/admin/system/sysRole'
 
 export default {

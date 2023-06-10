@@ -27,13 +27,12 @@
           <el-button :loading="loading" icon="el-icon-search" size="mini" type="primary" @click="fetchData()">搜索
           </el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetData">重置</el-button>
+          <!-- 工具条 -->
+          <!--          <div class="tools-div">-->
+          <el-button icon="el-icon-plus" size="mini" type="success" @click="add">添 加</el-button>
+          <!--          </div>-->
         </el-row>
       </el-form>
-    </div>
-
-    <!-- 工具条 -->
-    <div class="tools-div">
-      <el-button icon="el-icon-plus" size="mini" type="success" @click="add">添 加</el-button>
     </div>
 
     <!-- 列表 -->
@@ -67,10 +66,7 @@
       </el-table-column>
       <el-table-column label="状态" width="80">
         <template slot-scope="scope">
-          <el-switch
-            v-model="scope.row.status === 1"
-            @change="switchStatus(scope.row)"
-          />
+          <el-switch v-model="scope.row.status === 1" @change="switchStatus(scope.row)" />
         </template>
       </el-table-column>
       <el-table-column label="创建时间" prop="createTime" width="160" />
