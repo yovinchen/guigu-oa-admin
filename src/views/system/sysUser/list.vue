@@ -66,7 +66,10 @@
       </el-table-column>
       <el-table-column label="状态" width="80">
         <template slot-scope="scope">
-          <el-switch v-model="scope.row.status === 1" @change="switchStatus(scope.row)" />
+          <el-switch
+            v-model="scope.row.status === 1"
+            @change="switchStatus(scope.row)"
+          />
         </template>
       </el-table-column>
       <el-table-column label="创建时间" prop="createTime" width="160" />

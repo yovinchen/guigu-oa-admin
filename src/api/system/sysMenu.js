@@ -65,5 +65,33 @@ export default {
       method: 'put',
       data: sysMenu
     })
+  },
+  /**
+   * 查看某个角色的权限列表
+   *
+   * @param roleId
+   * @returns {AxiosPromise}
+   */
+
+  toAssign(roleId) {
+    return request({
+      url: `${api_name}/toAssign/${roleId}`,
+      method: 'get'
+    })
+  },
+
+  /**
+   * 给某个角色授权
+   *
+   * @param assignMenuVo
+   * @returns {AxiosPromise}
+   */
+
+  doAssign(assignMenuVo) {
+    return request({
+      url: `${api_name}/doAssign`,
+      method: 'post',
+      data: assignMenuVo
+    })
   }
 }
