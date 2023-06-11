@@ -255,7 +255,7 @@ export default {
 
     // -------------
     add(row) {
-      debugger
+      // debugger
       this.typeDisabled = false
       this.dialogTitle = '添加下级节点'
       this.dialogVisible = true
@@ -286,7 +286,7 @@ export default {
     },
 
     edit(row) {
-      debugger
+      // debugger
       this.dialogTitle = '修改节点'
       this.dialogVisible = true
 
