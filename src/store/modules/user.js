@@ -1,5 +1,5 @@
-import { getInfo, login, logout } from '@/api/user'
-import { getToken, removeToken, setToken } from '@/utils/auth'
+import { login, logout, getInfo } from '@/api/user'
+import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
 const getDefaultState = () => {
@@ -9,7 +9,7 @@ const getDefaultState = () => {
     avatar: '',
 
     buttons: [], // 新增
-    menus: '' // 新增
+    menus: '' //新增
   }
 }
 
@@ -54,7 +54,7 @@ const actions = {
     })
   },
 
-  // get user info
+// get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
       getInfo().then(response => {
@@ -69,8 +69,8 @@ const actions = {
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
 
-        commit('SET_BUTTONS', data.buttons)
-        commit('SET_MENUS', data.routers)
+        commit("SET_BUTTONS", data.buttons)
+        commit("SET_MENUS", data.routers)
         resolve(data)
       }).catch(error => {
         reject(error)

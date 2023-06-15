@@ -3,7 +3,14 @@
 
     <!-- 工具条 -->
     <div class="tools-div">
-      <el-button icon="el-icon-plus" size="mini" type="success" @click="add()">添 加</el-button>
+      <el-button
+        :disabled="$hasBP('bnt.sysMenu.add') === false"
+        icon="el-icon-plus"
+        size="mini"
+        type="success"
+        @click="add()"
+      >添 加
+      </el-button>
     </div>
     <el-table
       :data="sysMenuList"
@@ -14,16 +21,16 @@
       style="width: 100%;margin-bottom: 20px;margin-top: 10px;"
     >
 
-      <el-table-column label="菜单名称" prop="name" width="160" />
+      <el-table-column label="菜单名称" prop="name" width="160"/>
       <el-table-column label="图标">
         <template slot-scope="scope">
-          <i :class="scope.row.icon" />
+          <i :class="scope.row.icon"/>
         </template>
       </el-table-column>
-      <el-table-column label="权限标识" prop="perms" width="160" />
-      <el-table-column label="路由地址" prop="path" width="120" />
-      <el-table-column label="组件路径" prop="component" width="160" />
-      <el-table-column label="排序" prop="sortValue" width="60" />
+      <el-table-column label="权限标识" prop="perms" width="160"/>
+      <el-table-column label="路由地址" prop="path" width="120"/>
+      <el-table-column label="组件路径" prop="component" width="160"/>
+      <el-table-column label="排序" prop="sortValue" width="60"/>
       <el-table-column label="状态" width="80">
         <template slot-scope="scope">
           <el-switch
@@ -32,7 +39,7 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" prop="createTime" width="160" />
+      <el-table-column label="创建时间" prop="createTime" width="160"/>
       <el-table-column align="center" fixed="right" label="操作" width="180">
         <template slot-scope="scope">
           <el-button
@@ -43,9 +50,16 @@
             type="success"
             @click="add(scope.row)"
           />
-          <el-button icon="el-icon-edit" size="mini" title="修改" type="primary" @click="edit(scope.row)" />
           <el-button
-            :disabled="scope.row.children.length > 0"
+            :disabled="$hasBP('bnt.sysMenu.update') === false"
+            icon="el-icon-edit"
+            size="mini"
+            title="修改"
+            type="primary"
+            @click="edit(scope.row)"
+          />
+          <el-button
+            :disabled="(scope.row.children.length > 0) || !$hasBP('bnt.sysMenu.remove')"
             icon="el-icon-delete"
             size="mini"
             title="删除"
@@ -59,7 +73,7 @@
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="40%">
       <el-form ref="dataForm" :model="sysMenu" label-width="150px" size="small" style="padding-right: 40px;">
         <el-form-item v-if="sysMenu.id === ''" label="上级部门">
-          <el-input v-model="sysMenu.parentName" disabled="true" />
+          <el-input v-model="sysMenu.parentName" disabled="true"/>
         </el-form-item>
         <el-form-item label="菜单类型" prop="type">
           <el-radio-group v-model="sysMenu.type" :disabled="typeDisabled">
@@ -69,47 +83,47 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="菜单名称" prop="name">
-          <el-input v-model="sysMenu.name" />
+          <el-input v-model="sysMenu.name"/>
         </el-form-item>
         <el-form-item v-if="sysMenu.type !== 2" label="图标" prop="icon">
           <el-select v-model="sysMenu.icon" clearable>
             <el-option v-for="item in iconList" :key="item.class" :label="item.class" :value="item.class">
               <span style="float: left;">
-                <i :class="item.class" />  <!-- 如果动态显示图标，这里添加判断 -->
+                <i :class="item.class"/>  <!-- 如果动态显示图标，这里添加判断 -->
               </span>
               <span style="padding-left: 6px;">{{ item.class }}</span>
             </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="排序">
-          <el-input-number v-model="sysMenu.sortValue" :min="0" controls-position="right" />
+          <el-input-number v-model="sysMenu.sortValue" :min="0" controls-position="right"/>
         </el-form-item>
         <el-form-item prop="path">
           <span slot="label">
             <el-tooltip content="访问的路由地址，如：`sysUser`" placement="top">
-              <i class="el-icon-question" />
+              <i class="el-icon-question"/>
             </el-tooltip>
             路由地址
           </span>
-          <el-input v-model="sysMenu.path" placeholder="请输入路由地址" />
+          <el-input v-model="sysMenu.path" placeholder="请输入路由地址"/>
         </el-form-item>
         <el-form-item v-if="sysMenu.type !== 0" prop="component">
           <span slot="label">
             <el-tooltip content="访问的组件路径，如：`system/user/index`，默认在`views`目录下" placement="top">
-              <i class="el-icon-question" />
+              <i class="el-icon-question"/>
             </el-tooltip>
             组件路径
           </span>
-          <el-input v-model="sysMenu.component" placeholder="请输入组件路径" />
+          <el-input v-model="sysMenu.component" placeholder="请输入组件路径"/>
         </el-form-item>
         <el-form-item v-if="sysMenu.type === 2">
-          <el-input v-model="sysMenu.perms" maxlength="100" placeholder="请输入权限标识" />
+          <el-input v-model="sysMenu.perms" maxlength="100" placeholder="请输入权限标识"/>
           <span slot="label">
             <el-tooltip
               content="控制器中定义的权限字符，如：@PreAuthorize(hasAuthority('bnt.sysRole.list'))"
               placement="top"
             >
-              <i class="el-icon-question" />
+              <i class="el-icon-question"/>
             </el-tooltip>
             权限字符
           </span>
@@ -255,7 +269,7 @@ export default {
 
     // -------------
     add(row) {
-      // debugger
+      debugger
       this.typeDisabled = false
       this.dialogTitle = '添加下级节点'
       this.dialogVisible = true
@@ -286,7 +300,7 @@ export default {
     },
 
     edit(row) {
-      // debugger
+      debugger
       this.dialogTitle = '修改节点'
       this.dialogVisible = true
 

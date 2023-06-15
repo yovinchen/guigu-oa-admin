@@ -1,21 +1,15 @@
 import request from '@/utils/request'
 
-/**
- * 菜单管理相关的API请求函数
- *
- * @type {string}
- */
-
+/*
+菜单管理相关的API请求函数
+*/
 const api_name = '/admin/system/sysMenu'
 
 export default {
 
-  /**
-   * 获取权限(菜单/功能)列表
-   *
-   * @returns {AxiosPromise}
-   */
-
+  /*
+  获取权限(菜单/功能)列表
+  */
   findNodes() {
     return request({
       url: `${api_name}/findNodes`,
@@ -23,56 +17,41 @@ export default {
     })
   },
 
-  /**
-   * 删除一个权限项
-   *
-   * @param id
-   * @returns {AxiosPromise}
-   */
-
+  /*
+  删除一个权限项
+  */
   removeById(id) {
     return request({
       url: `${api_name}/remove/${id}`,
-      method: 'delete'
+      method: "delete"
     })
   },
 
-  /**
-   * 保存一个权限项
-   *
-   * @param sysMenu
-   * @returns {AxiosPromise}
-   */
-
+  /*
+  保存一个权限项
+  */
   save(sysMenu) {
     return request({
       url: `${api_name}/save`,
-      method: 'post',
+      method: "post",
       data: sysMenu
     })
   },
 
-  /**
-   * 更新一个权限项
-   *
-   * @param sysMenu
-   * @returns {AxiosPromise}
-   */
-
+  /*
+  更新一个权限项
+  */
   updateById(sysMenu) {
     return request({
       url: `${api_name}/update`,
-      method: 'put',
+      method: "put",
       data: sysMenu
     })
   },
-  /**
-   * 查看某个角色的权限列表
-   *
-   * @param roleId
-   * @returns {AxiosPromise}
-   */
 
+  /*
+查看某个角色的权限列表
+*/
   toAssign(roleId) {
     return request({
       url: `${api_name}/toAssign/${roleId}`,
@@ -80,18 +59,14 @@ export default {
     })
   },
 
-  /**
-   * 给某个角色授权
-   *
-   * @param assignMenuVo
-   * @returns {AxiosPromise}
-   */
-
-  doAssign(assignMenuVo) {
+  /*
+  给某个角色授权
+  */
+  doAssign(assginMenuVo) {
     return request({
       url: `${api_name}/doAssign`,
-      method: 'post',
-      data: assignMenuVo
+      method: "post",
+      data: assginMenuVo
     })
   }
 }
