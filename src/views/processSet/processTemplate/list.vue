@@ -41,6 +41,7 @@
       <el-table-column label="更新时间" prop="updateTime" />
       <el-table-column align="center" label="操作" width="250">
         <template slot-scope="scope">
+          <el-button size="mini" type="text" @click="show(scope.row)">查看审批设置</el-button>
           <el-button
             :disabled="$hasBP('bnt.processTemplate.templateSet') === false"
             size="mini"
@@ -54,6 +55,14 @@
             type="text"
             @click="removeDataById(scope.row.id)"
           >删除
+          </el-button>
+          <el-button
+            v-if="scope.row.status == 0"
+            :disabled="$hasBP('bnt.processTemplate.publish') === false"
+            size="mini"
+            type="text"
+            @click="publish(scope.row.id)"
+          >发布
           </el-button>
         </template>
       </el-table-column>
@@ -69,6 +78,28 @@
       @current-change="fetchData"
       @size-change="changeSize"
     />
+
+    <el-dialog :visible.sync="formDialogVisible" title="查看审批设置" width="35%">
+      <h3>基本信息</h3>
+      <el-divider />
+      <el-form ref="flashPromotionForm" label-width="150px" size="small" style="padding-right: 40px;">
+        <el-form-item label="审批类型" style="margin-bottom: 0px;">{{ processTemplate.processTypeName }}</el-form-item>
+        <el-form-item label="名称" style="margin-bottom: 0px;">{{ processTemplate.name }}</el-form-item>
+        <el-form-item label="创建时间" style="margin-bottom: 0px;">{{ processTemplate.createTime }}</el-form-item>
+      </el-form>
+      <h3>表单信息</h3>
+      <el-divider />
+      <div>
+        <form-create
+          :option="option"
+          :rule="rule"
+        />
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="small" @click="formDialogVisible = false">取 消</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 <script>
@@ -82,7 +113,11 @@ export default {
       total: 0, // 数据库中的总记录数
       page: 1, // 默认页码
       limit: 10, // 每页记录数
-      searchObj: {} // 查询表单对象
+      searchObj: {}, // 查询表单对象
+      rule: [],
+      option: {},
+      processTemplate: {},
+      formDialogVisible: false
     }
   },
   // 生命周期函数：内存准备完毕，页面尚未渲染
@@ -93,6 +128,20 @@ export default {
   mounted() {
   },
   methods: {
+    // 发布
+    publish(id) {
+      api.publish(id).then(response => {
+        this.$message.success('发布成功')
+        this.fetchData(this.page)
+      })
+    },
+    // 查看审批模版
+    show(row) {
+      this.rule = JSON.parse(row.formProps)
+      this.option = JSON.parse(row.formOptions)
+      this.processTemplate = row
+      this.formDialogVisible = true
+    },
     // 当页码发生改变的时候
     changeSize(size) {
       this.limit = size
