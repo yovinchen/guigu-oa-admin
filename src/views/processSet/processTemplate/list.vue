@@ -43,6 +43,7 @@
         <template slot-scope="scope">
           <el-button size="mini" type="text" @click="show(scope.row)">查看审批设置</el-button>
           <el-button
+            v-if="scope.row.status === 0"
             :disabled="$hasBP('bnt.processTemplate.templateSet') === false"
             size="mini"
             type="text"
@@ -50,6 +51,7 @@
           >修改审批设置
           </el-button>
           <el-button
+            v-if="scope.row.status === 0"
             :disabled="$hasBP('bnt.processTemplate.remove') === false"
             size="mini"
             type="text"
@@ -57,7 +59,7 @@
           >删除
           </el-button>
           <el-button
-            v-if="scope.row.status == 0"
+            v-if="scope.row.status === 0"
             :disabled="$hasBP('bnt.processTemplate.publish') === false"
             size="mini"
             type="text"
