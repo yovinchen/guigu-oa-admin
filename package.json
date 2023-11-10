@@ -16,7 +16,7 @@
   "dependencies": {
     "@form-create/element-ui": "^2.5.17",
     "@form-create/designer": "^1.0.8",
-    "axios": "0.18.1",
+    "axios": "1.6.0",
     "core-js": "3.6.5",
     "element-ui": "2.13.2",
     "js-cookie": "2.2.0",
